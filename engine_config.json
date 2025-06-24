@@ -1,0 +1,78 @@
+{
+    "Baidu": {
+        "url": "https://www.baidu.com/s?wd=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Bilibili": {
+        "url": "https://search.bilibili.com/all?keyword=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/bilibili.png"
+    },
+    "DuckDuckGo": {
+        "url": "https://duckduckgo.com/?q=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/duckduckgo.png"
+    },
+    "高德": {
+        "url": "https://ditu.amap.com/search?query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/gaode.png"
+    },
+    "Google": {
+        "url": "https://www.google.com/search?q=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/google.png"
+    },
+    "什么值得买": {
+        "url": "https://search.smzdm.com/?s=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/smzdm.png"
+    },
+    "小红书": {
+        "url": "https://www.xiaohongshu.com/search_result?keyword=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/xhs.png"
+    },
+    "yandex": {
+        "url": "https://yandex.com/search/?text=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/yandex.png"
+    },
+    "Youtube1": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube10": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube15": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube2": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube3": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube4": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube5": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube6": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube7": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube8": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    },
+    "Youtube9": {
+        "url": "https://www.youtube.com/results?search_query=",
+        "icon": "D:/Code/PythonCode/newlearnProject/EasySearch/icons/baidu.png"
+    }
+}
