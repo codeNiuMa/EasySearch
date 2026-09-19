@@ -6,6 +6,8 @@ EasySearch 是一个低干扰的搜索起点。它不聚合内容、不展示热
 
 项目最初是一个用于学习 Python 和 CustomTkinter 的桌面小工具，现在已经改造为无需后端、可以直接静态部署的网页应用。
 
+在线使用：[https://codeniuma.github.io/EasySearch/](https://codeniuma.github.io/EasySearch/)
+
 ## 核心理念
 
 许多网站的首页同时承担推荐、广告、热榜和内容分发等功能。即使原本只是想搜索一个明确的问题，也很容易在进入首页后被其他内容打断。
@@ -50,8 +52,8 @@ EasySearch/
 │   ├── index.html       # 页面结构与元信息
 │   ├── styles.css       # 响应式布局、主题与组件样式
 │   └── app.js           # 搜索入口、交互、本地配置和 WebMCP
-├── .openai/
-│   └── hosting.json     # 静态站点托管配置
+├── .github/workflows/
+│   └── pages.yml        # GitHub Pages 自动部署工作流
 ├── README.md            # 项目说明
 ├── sousuo.py            # 旧版 Python 桌面应用
 ├── engine_config.json   # 旧版搜索入口配置
@@ -121,15 +123,17 @@ node --check .\dist\app.js
 
 `prepare_search` 只负责准备搜索，不会代替用户提交，也不会自动打开第三方网站。这一边界与项目“明确意图、主动出发”的理念保持一致。
 
-## 静态部署
+## GitHub Pages 部署
 
-可以将 `dist/` 部署到任意支持静态文件的网站托管服务。需要确保：
+仓库通过 GitHub Actions 自动发布 `dist/`。每次向 `main` 分支推送提交后，`.github/workflows/pages.yml` 都会上传静态文件并更新 GitHub Pages。
+
+GitHub 仓库需要在 **Settings → Pages → Build and deployment** 中选择 **GitHub Actions** 作为发布来源。
+
+也可以将 `dist/` 部署到其他支持静态文件的网站托管服务。需要确保：
 
 - 站点入口为 `dist/index.html`；
 - `index.html`、`styles.css` 和 `app.js` 保持在同一目录；
 - 托管服务能够以 UTF-8 返回文本文件。
-
-项目当前也包含 OpenAI Sites 的静态托管配置。
 
 ## 旧版 Python 程序
 
