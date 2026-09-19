@@ -49,74 +49,93 @@
     </header>
 
     <main class="app-shell">
-      <aside class="sidebar" aria-label="使用提示">
-        <div class="focus-card">
-          <span class="eyebrow">FOCUS MODE</span>
-          <h2>只带着问题出发</h2>
-          <p>这里没有热榜、推荐和自动加载的内容。选择入口，输入关键词，直接抵达结果。</p>
-        </div>
-
-        <div class="shortcut-list" aria-label="快捷键">
-          <div><span>聚焦搜索框</span><kbd>/</kbd></div>
-          <div><span>切换入口</span><kbd>Alt</kbd><span class="key-plus">+</span><kbd>1–9</kbd></div>
-          <div><span>开始搜索</span><kbd>Enter</kbd></div>
-        </div>
-
-        <button class="manage-button" id="manage-engines" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14"></path>
-          </svg>
-          添加自定义入口
-        </button>
-      </aside>
-
-      <section class="workspace" aria-labelledby="page-title">
-        <div class="workspace-heading">
-          <div>
-            <p class="eyebrow">DIRECT SEARCH</p>
-            <h1 id="page-title">搜索，不必先去首页</h1>
-          </div>
-          <p class="date-line" id="date-line" aria-label="今天"></p>
-        </div>
-
-        <form class="search-panel" id="search-form" novalidate>
-          <label class="search-label" for="search-input">想查什么？</label>
-          <div class="search-control">
-            <div class="selected-engine" id="selected-engine" aria-hidden="true"></div>
-            <input
-              id="search-input"
-              name="query"
-              type="search"
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="输入关键词，按 Enter 直达结果…"
-              aria-describedby="search-hint"
-            />
-            <button class="search-button" type="submit">
-              <span>直达搜索</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6"></path>
-              </svg>
-            </button>
-          </div>
-          <p class="search-hint" id="search-hint" aria-live="polite">
-            关键词仅用于生成目标网址，不会上传到 EasySearch。
-          </p>
-        </form>
-
-        <section class="engine-section" aria-labelledby="engine-title">
+      <section class="engine-library" aria-labelledby="engine-title">
+        <div class="engine-library-header">
           <div class="section-heading">
             <div>
+              <p class="eyebrow">SEARCH LIBRARY</p>
               <h2 id="engine-title">选择搜索入口</h2>
-              <p>入口决定去哪里，问题始终由你决定。</p>
+              <p>所有入口集中在这里，滚动浏览不会打断右侧搜索。</p>
             </div>
-            <div class="category-tabs" id="category-tabs" aria-label="入口分类"></div>
+            <span class="engine-count" id="engine-count" aria-live="polite"></span>
+          </div>
+          <div class="category-tabs" id="category-tabs" aria-label="入口分类"></div>
+        </div>
+
+        <div class="engine-grid" id="engine-grid" role="radiogroup" aria-label="搜索入口"></div>
+        <p class="empty-state" id="empty-state" hidden>这个分类暂时没有入口。</p>
+      </section>
+
+      <aside class="workspace" aria-labelledby="page-title">
+        <div class="workspace-inner">
+          <div class="workspace-heading">
+            <div>
+              <p class="eyebrow">DIRECT SEARCH</p>
+              <h1 id="page-title">搜索，不必先去首页</h1>
+            </div>
+            <p class="date-line" id="date-line" aria-label="今天"></p>
           </div>
 
-          <div class="engine-grid" id="engine-grid" role="radiogroup" aria-label="搜索入口"></div>
-          <p class="empty-state" id="empty-state" hidden>这个分类暂时没有入口。</p>
-        </section>
-      </section>
+          <form class="search-panel" id="search-form" novalidate>
+            <div class="search-label-row">
+              <label class="search-label" for="search-input">想查什么？</label>
+              <span class="current-engine">当前：<strong id="selected-engine-name"></strong></span>
+            </div>
+            <div class="search-control">
+              <div class="selected-engine" id="selected-engine" aria-hidden="true"></div>
+              <input
+                id="search-input"
+                name="query"
+                type="search"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="输入关键词…"
+                aria-describedby="search-hint"
+              />
+              <button class="search-button" type="submit">
+                <span>直达搜索</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6"></path>
+                </svg>
+              </button>
+            </div>
+            <p class="search-hint" id="search-hint" aria-live="polite">
+              关键词仅用于生成目标网址，不会上传到 EasySearch。
+            </p>
+          </form>
+
+          <div class="widget-grid">
+            <div class="focus-card">
+              <span class="eyebrow">FOCUS MODE</span>
+              <h2>只带着问题出发</h2>
+              <p>没有热榜、推荐和自动加载的内容。选好入口，直接抵达结果。</p>
+            </div>
+
+            <div class="privacy-widget">
+              <span class="widget-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.9 8.5 7 10 4.1-1.5 7-5.4 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+              </span>
+              <div>
+                <strong>本地保存偏好</strong>
+                <p>主题、入口和自定义配置只保存在当前浏览器。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="shortcut-list" aria-label="快捷键">
+            <div><span>聚焦搜索框</span><kbd>/</kbd></div>
+            <div><span>切换前 9 个入口</span><kbd>Alt</kbd><span class="key-plus">+</span><kbd>1–9</kbd></div>
+            <div><span>开始搜索</span><kbd>Enter</kbd></div>
+          </div>
+
+          <button class="manage-button" id="manage-engines" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            添加自定义入口
+          </button>
+        </div>
+      </aside>
     </main>
 
     <footer>

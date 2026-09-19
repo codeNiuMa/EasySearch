@@ -25,6 +25,7 @@ EasySearch 将搜索过程缩短为三个动作：
 - 内置 Google、百度、Bing、Yahoo、DuckDuckGo、Yandex、搜狗和 Brave Search 等通用搜索入口；
 - 内置维基百科、Google Scholar、GitHub、Stack Overflow、知乎、Reddit、哔哩哔哩、YouTube、小红书、什么值得买和高德地图等垂直入口；
 - 优先显示各来源网站的官方图标；图标不可用时自动回退为字母标记；
+- 桌面端采用左右分栏：左侧入口库独立滚动，右侧搜索区保持稳定；移动端自动切换为纵向布局；
 - 支持按类型筛选搜索入口；
 - 支持用户添加自己的搜索地址模板；
 - 自动记住上次使用的搜索入口和明暗主题；

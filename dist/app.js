@@ -194,7 +194,9 @@ const elements = {
   searchInput: document.querySelector("#search-input"),
   searchHint: document.querySelector("#search-hint"),
   selectedEngine: document.querySelector("#selected-engine"),
+  selectedEngineName: document.querySelector("#selected-engine-name"),
   engineGrid: document.querySelector("#engine-grid"),
+  engineCount: document.querySelector("#engine-count"),
   emptyState: document.querySelector("#empty-state"),
   categoryTabs: document.querySelector("#category-tabs"),
   manageEngines: document.querySelector("#manage-engines"),
@@ -359,6 +361,8 @@ function renderEngines() {
     .join("");
 
   enableIconFallbacks(elements.engineGrid);
+  elements.engineCount.textContent =
+    state.category === "全部" ? `${engines.length} 个入口` : `${filtered.length} / ${engines.length}`;
   elements.emptyState.hidden = filtered.length > 0;
   updateSelectedDisplay();
 }
@@ -368,6 +372,7 @@ function updateSelectedDisplay() {
   elements.selectedEngine.classList.remove("icon-failed");
   elements.selectedEngine.innerHTML = renderEngineBadgeContents(engine, false);
   elements.selectedEngine.style.setProperty("--engine-color", engine.color);
+  elements.selectedEngineName.textContent = engine.name;
   enableIconFallbacks(elements.selectedEngine);
   elements.searchInput.setAttribute("aria-label", `使用${engine.name}搜索`);
 }
