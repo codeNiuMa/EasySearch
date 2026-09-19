@@ -435,6 +435,10 @@ function openEngineDialog() {
   window.setTimeout(() => elements.customName.focus(), 40);
 }
 
+function closeEngineDialog() {
+  elements.engineDialog.close();
+}
+
 function saveCustomEngine() {
   const name = elements.customName.value.trim();
   const template = elements.customUrl.value.trim();
@@ -590,10 +594,17 @@ elements.engineGrid.addEventListener("click", (event) => {
 elements.manageEngines.addEventListener("click", openEngineDialog);
 
 elements.engineForm.addEventListener("submit", (event) => {
-  const submitter = event.submitter;
-  if (submitter?.value === "cancel") return;
   event.preventDefault();
   saveCustomEngine();
+});
+
+elements.engineDialog.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-dialog]")) closeEngineDialog();
+});
+
+elements.engineDialog.addEventListener("close", () => {
+  elements.engineForm.reset();
+  elements.formError.textContent = "";
 });
 
 elements.customList.addEventListener("click", (event) => {
