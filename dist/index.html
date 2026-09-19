@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="EasySearch 是一个低干扰搜索起点：跳过主页信息流，直接抵达搜索结果。"
+    />
+    <meta name="theme-color" content="#f4f7fb" />
+    <title>EasySearch · 专注搜索</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231d4ed8'/%3E%3Ccircle cx='28' cy='28' r='14' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='m39 39 12 12' stroke='%23a7f3d0' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#search-input">跳到搜索框</a>
+
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="EasySearch 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" role="img">
+            <circle cx="18" cy="18" r="9"></circle>
+            <path d="m25 25 8 8"></path>
+          </svg>
+        </span>
+        <span>EasySearch</span>
+      </a>
+
+      <div class="topbar-actions">
+        <span class="privacy-note">
+          <span class="status-dot" aria-hidden="true"></span>
+          本地运行，不追踪
+        </span>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深色模式">
+          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="使用提示">
+        <div class="focus-card">
+          <span class="eyebrow">FOCUS MODE</span>
+          <h2>只带着问题出发</h2>
+          <p>这里没有热榜、推荐和自动加载的内容。选择入口，输入关键词，直接抵达结果。</p>
+        </div>
+
+        <div class="shortcut-list" aria-label="快捷键">
+          <div><span>聚焦搜索框</span><kbd>/</kbd></div>
+          <div><span>切换入口</span><kbd>Alt</kbd><span class="key-plus">+</span><kbd>1–9</kbd></div>
+          <div><span>开始搜索</span><kbd>Enter</kbd></div>
+        </div>
+
+        <button class="manage-button" id="manage-engines" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          添加自定义入口
+        </button>
+      </aside>
+
+      <section class="workspace" aria-labelledby="page-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow">DIRECT SEARCH</p>
+            <h1 id="page-title">搜索，不必先去首页</h1>
+          </div>
+          <p class="date-line" id="date-line" aria-label="今天"></p>
+        </div>
+
+        <form class="search-panel" id="search-form" novalidate>
+          <label class="search-label" for="search-input">想查什么？</label>
+          <div class="search-control">
+            <div class="selected-engine" id="selected-engine" aria-hidden="true"></div>
+            <input
+              id="search-input"
+              name="query"
+              type="search"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="输入关键词，按 Enter 直达结果…"
+              aria-describedby="search-hint"
+            />
+            <button class="search-button" type="submit">
+              <span>直达搜索</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+              </svg>
+            </button>
+          </div>
+          <p class="search-hint" id="search-hint" aria-live="polite">
+            关键词仅用于生成目标网址，不会上传到 EasySearch。
+          </p>
+        </form>
+
+        <section class="engine-section" aria-labelledby="engine-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="engine-title">选择搜索入口</h2>
+              <p>入口决定去哪里，问题始终由你决定。</p>
+            </div>
+            <div class="category-tabs" id="category-tabs" aria-label="入口分类"></div>
+          </div>
+
+          <div class="engine-grid" id="engine-grid" role="radiogroup" aria-label="搜索入口"></div>
+          <p class="empty-state" id="empty-state" hidden>这个分类暂时没有入口。</p>
+        </section>
+      </section>
+    </main>
+
+    <footer>
+      <span>EasySearch</span>
+      <span aria-hidden="true">·</span>
+      <span>少一点信息流，多一点主动选择</span>
+    </footer>
+
+    <dialog class="engine-dialog" id="engine-dialog" aria-labelledby="dialog-title">
+      <form method="dialog" class="dialog-card" id="engine-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">LOCAL ENTRY</p>
+            <h2 id="dialog-title">添加自定义入口</h2>
+          </div>
+          <button class="dialog-close" value="cancel" type="submit" aria-label="关闭">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+
+        <p class="dialog-copy">自定义入口只保存在当前浏览器。用 <code>{query}</code> 标记关键词的位置。</p>
+
+        <label>
+          <span>入口名称</span>
+          <input id="custom-name" name="name" maxlength="20" placeholder="例如：MDN" required />
+        </label>
+        <label>
+          <span>搜索地址模板</span>
+          <input
+            id="custom-url"
+            name="url"
+            type="url"
+            placeholder="https://example.com/search?q={query}"
+            required
+          />
+        </label>
+        <p class="form-error" id="form-error" role="alert"></p>
+
+        <div class="dialog-actions">
+          <button class="secondary-button" value="cancel" type="submit">取消</button>
+          <button class="primary-button" value="default" type="submit">保存入口</button>
+        </div>
+
+        <section class="custom-list-section" id="custom-list-section" hidden>
+          <h3>已添加的入口</h3>
+          <div class="custom-list" id="custom-list"></div>
+        </section>
+      </form>
+    </dialog>
+
+    <noscript>EasySearch 需要启用 JavaScript 才能生成搜索地址。</noscript>
+  </body>
+</html>
