@@ -5,6 +5,7 @@ const DEFAULT_ENGINES = [
     mark: "G",
     category: "通用",
     color: "#4285f4",
+    icon: "https://www.google.com/favicon.ico",
     template: "https://www.google.com/search?q={query}",
   },
   {
@@ -13,7 +14,26 @@ const DEFAULT_ENGINES = [
     mark: "百",
     category: "通用",
     color: "#315efb",
+    icon: "https://www.baidu.com/favicon.ico",
     template: "https://www.baidu.com/s?wd={query}",
+  },
+  {
+    id: "bing",
+    name: "Bing",
+    mark: "B",
+    category: "通用",
+    color: "#008373",
+    icon: "https://www.bing.com/favicon.ico",
+    template: "https://www.bing.com/search?q={query}",
+  },
+  {
+    id: "yahoo",
+    name: "Yahoo",
+    mark: "Y",
+    category: "通用",
+    color: "#6001d2",
+    icon: "https://s.yimg.com/rz/l/favicon.ico",
+    template: "https://search.yahoo.com/search?p={query}",
   },
   {
     id: "duckduckgo",
@@ -21,6 +41,7 @@ const DEFAULT_ENGINES = [
     mark: "D",
     category: "通用",
     color: "#de5833",
+    icon: "https://duckduckgo.com/favicon.ico",
     template: "https://duckduckgo.com/?q={query}",
   },
   {
@@ -29,7 +50,80 @@ const DEFAULT_ENGINES = [
     mark: "Y",
     category: "通用",
     color: "#ed1c24",
+    icon: "https://yandex.com/favicon.ico",
     template: "https://yandex.com/search/?text={query}",
+  },
+  {
+    id: "sogou",
+    name: "搜狗",
+    mark: "搜",
+    category: "通用",
+    color: "#ff5a34",
+    icon: "https://www.sogou.com/favicon.ico",
+    template: "https://www.sogou.com/web?query={query}",
+  },
+  {
+    id: "brave",
+    name: "Brave Search",
+    mark: "B",
+    category: "通用",
+    color: "#fb542b",
+    icon: "https://brave.com/static-assets/images/brave-favicon.png",
+    template: "https://search.brave.com/search?q={query}",
+  },
+  {
+    id: "wikipedia",
+    name: "维基百科",
+    mark: "维",
+    category: "知识",
+    color: "#54595d",
+    icon: "https://www.wikipedia.org/static/favicon/wikipedia.ico",
+    template: "https://zh.wikipedia.org/w/index.php?search={query}",
+  },
+  {
+    id: "scholar",
+    name: "Google Scholar",
+    mark: "学",
+    category: "知识",
+    color: "#4285f4",
+    icon: "https://scholar.google.com/favicon.ico",
+    template: "https://scholar.google.com/scholar?q={query}",
+  },
+  {
+    id: "github",
+    name: "GitHub",
+    mark: "GH",
+    category: "开发",
+    color: "#24292f",
+    icon: "https://github.com/favicon.ico",
+    template: "https://github.com/search?q={query}",
+  },
+  {
+    id: "stackoverflow",
+    name: "Stack Overflow",
+    mark: "SO",
+    category: "开发",
+    color: "#f48024",
+    icon: "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico?v=ec617d715196",
+    template: "https://stackoverflow.com/search?q={query}",
+  },
+  {
+    id: "zhihu",
+    name: "知乎",
+    mark: "知",
+    category: "社区",
+    color: "#1772f6",
+    icon: "https://www.zhihu.com/favicon.ico",
+    template: "https://www.zhihu.com/search?type=content&q={query}",
+  },
+  {
+    id: "reddit",
+    name: "Reddit",
+    mark: "R",
+    category: "社区",
+    color: "#ff4500",
+    icon: "https://www.reddit.com/favicon.ico",
+    template: "https://www.reddit.com/search/?q={query}",
   },
   {
     id: "bilibili",
@@ -37,6 +131,7 @@ const DEFAULT_ENGINES = [
     mark: "B",
     category: "视频",
     color: "#00aeec",
+    icon: "https://www.bilibili.com/favicon.ico",
     template: "https://search.bilibili.com/all?keyword={query}",
   },
   {
@@ -45,6 +140,7 @@ const DEFAULT_ENGINES = [
     mark: "▶",
     category: "视频",
     color: "#ff0033",
+    icon: "https://www.youtube.com/favicon.ico",
     template: "https://www.youtube.com/results?search_query={query}",
   },
   {
@@ -53,6 +149,7 @@ const DEFAULT_ENGINES = [
     mark: "小",
     category: "生活",
     color: "#ff2442",
+    icon: "https://www.xiaohongshu.com/favicon.ico",
     template: "https://www.xiaohongshu.com/search_result?keyword={query}",
   },
   {
@@ -61,6 +158,7 @@ const DEFAULT_ENGINES = [
     mark: "值",
     category: "生活",
     color: "#e62828",
+    icon: "https://www.smzdm.com/favicon.ico",
     template: "https://search.smzdm.com/?s={query}",
   },
   {
@@ -69,6 +167,7 @@ const DEFAULT_ENGINES = [
     mark: "图",
     category: "地图",
     color: "#3478f6",
+    icon: "https://ditu.amap.com/favicon.ico",
     template: "https://ditu.amap.com/search?query={query}",
   },
 ];
@@ -79,7 +178,7 @@ const STORAGE = {
   custom: "easysearch.custom-engines",
 };
 
-const CATEGORY_ORDER = ["全部", "通用", "视频", "生活", "地图", "自定义"];
+const CATEGORY_ORDER = ["全部", "通用", "知识", "开发", "社区", "视频", "生活", "地图", "自定义"];
 const state = {
   category: "全部",
   selectedId: localStorage.getItem(STORAGE.selected) || "google",
@@ -144,6 +243,19 @@ function getDomain(template) {
   }
 }
 
+function getIconUrl(engine) {
+  try {
+    const candidate =
+      typeof engine.icon === "string" && engine.icon
+        ? engine.icon
+        : `${new URL(engine.template.replace("{query}", "keyword")).origin}/favicon.ico`;
+    const parsed = new URL(candidate);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch {
+    return "";
+  }
+}
+
 function escapeMarkup(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -151,6 +263,29 @@ function escapeMarkup(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function renderEngineBadgeContents(engine, lazy = true) {
+  const fallback = `<span class="engine-fallback">${escapeMarkup(engine.mark)}</span>`;
+  const iconUrl = getIconUrl(engine);
+  if (!iconUrl) return fallback;
+
+  return `${fallback}<img
+    class="engine-icon"
+    src="${escapeMarkup(iconUrl)}"
+    alt=""
+    decoding="async"
+    referrerpolicy="no-referrer"
+    ${lazy ? 'loading="lazy"' : ""}
+  />`;
+}
+
+function enableIconFallbacks(scope) {
+  scope.querySelectorAll(".engine-icon").forEach((image) => {
+    const showFallback = () => image.closest(".engine-badge, .selected-engine")?.classList.add("icon-failed");
+    image.addEventListener("error", showFallback, { once: true });
+    if (image.complete && image.naturalWidth === 0) showFallback();
+  });
 }
 
 function setTheme(theme) {
@@ -212,7 +347,7 @@ function renderEngines() {
           data-engine-id="${escapeMarkup(engine.id)}"
           style="--engine-color: ${escapeMarkup(engine.color)}"
         >
-          <span class="engine-badge" aria-hidden="true">${escapeMarkup(engine.mark)}</span>
+          <span class="engine-badge" aria-hidden="true">${renderEngineBadgeContents(engine)}</span>
           <span class="engine-copy">
             <span class="engine-name">${escapeMarkup(engine.name)}</span>
             <span class="engine-domain">${escapeMarkup(getDomain(engine.template))}</span>
@@ -223,14 +358,17 @@ function renderEngines() {
     })
     .join("");
 
+  enableIconFallbacks(elements.engineGrid);
   elements.emptyState.hidden = filtered.length > 0;
   updateSelectedDisplay();
 }
 
 function updateSelectedDisplay() {
   const engine = getSelectedEngine();
-  elements.selectedEngine.textContent = engine.mark;
+  elements.selectedEngine.classList.remove("icon-failed");
+  elements.selectedEngine.innerHTML = renderEngineBadgeContents(engine, false);
   elements.selectedEngine.style.setProperty("--engine-color", engine.color);
+  enableIconFallbacks(elements.selectedEngine);
   elements.searchInput.setAttribute("aria-label", `使用${engine.name}搜索`);
 }
 

@@ -384,6 +384,8 @@ kbd {
 }
 
 .selected-engine {
+  position: relative;
+  overflow: hidden;
   width: 48px;
   height: 48px;
   flex: 0 0 48px;
@@ -562,6 +564,8 @@ kbd {
 }
 
 .engine-badge {
+  position: relative;
+  overflow: hidden;
   width: 46px;
   height: 46px;
   display: grid;
@@ -571,6 +575,31 @@ kbd {
   background: var(--engine-color);
   font-weight: 820;
   letter-spacing: -0.03em;
+}
+
+.engine-fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
+.engine-icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.selected-engine .engine-icon {
+  padding: 9px;
+}
+
+.icon-failed .engine-icon {
+  display: none;
 }
 
 .engine-copy {

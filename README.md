@@ -22,8 +22,9 @@ EasySearch 将搜索过程缩短为三个动作：
 
 ## 功能
 
-- 内置 Google、百度、DuckDuckGo、Yandex 等通用搜索入口；
-- 内置哔哩哔哩、YouTube、小红书、什么值得买和高德地图等垂直入口；
+- 内置 Google、百度、Bing、Yahoo、DuckDuckGo、Yandex、搜狗和 Brave Search 等通用搜索入口；
+- 内置维基百科、Google Scholar、GitHub、Stack Overflow、知乎、Reddit、哔哩哔哩、YouTube、小红书、什么值得买和高德地图等垂直入口；
+- 优先显示各来源网站的官方图标；图标不可用时自动回退为字母标记；
 - 支持按类型筛选搜索入口；
 - 支持用户添加自己的搜索地址模板；
 - 自动记住上次使用的搜索入口和明暗主题；
@@ -34,10 +35,11 @@ EasySearch 将搜索过程缩短为三个动作：
 
 ## 隐私与网络请求
 
-EasySearch 的网页文件全部在本地运行：
+EasySearch 的交互逻辑全部在浏览器中运行：
 
 - 不包含统计、广告或用户追踪代码；
-- 不加载第三方字体、图标和图片；
+- 不加载第三方字体、广告或推广图片；
+- 品牌图标直接取自对应网站或其官方静态资源域名，不经过第三方图标代理；请求不包含搜索词，并使用 `no-referrer`；
 - 不向 EasySearch 服务器上传搜索词；
 - 自定义入口、主题和最后使用的入口只保存在浏览器的 `localStorage` 中；
 - 不需要账号、数据库或后端服务。
@@ -97,6 +99,7 @@ https://developer.mozilla.org/zh-CN/search?q={query}
   mark: "E",
   category: "通用",
   color: "#2457d6",
+  icon: "https://example.com/favicon.ico",
   template: "https://example.com/search?q={query}"
 }
 ```
@@ -106,6 +109,7 @@ https://developer.mozilla.org/zh-CN/search?q={query}
 - `mark`：入口卡片上的单字或字母标记；
 - `category`：所属分类；
 - `color`：入口标记颜色；
+- `icon`：可选的官方网站图标地址；加载失败时会显示 `mark`；
 - `template`：必须包含 `{query}` 的搜索地址模板。
 
 修改后可以运行以下命令检查 JavaScript 语法：
