@@ -202,21 +202,19 @@ button {
 }
 
 .app-shell {
-  width: min(1600px, 100%);
+  width: 100%;
   height: calc(100vh - 76px);
   height: calc(100dvh - 76px);
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(540px, 1.15fr) minmax(420px, 0.85fr);
+  grid-template-columns: clamp(560px, 37vw, 920px) minmax(0, 1fr);
   gap: 0;
-  padding: 0 clamp(24px, 4vw, 64px);
   overflow: hidden;
 }
 
 .engine-library {
   min-width: 0;
   min-height: 0;
-  padding: 42px clamp(26px, 3vw, 48px) 48px 0;
+  padding: 42px clamp(24px, 2.5vw, 48px) 48px clamp(24px, 4vw, 64px);
   overflow-y: auto;
   border-right: 1px solid var(--line);
   scrollbar-gutter: stable;
@@ -381,14 +379,14 @@ kbd {
   min-width: 0;
   min-height: 0;
   display: flex;
-  padding: 42px 0 48px clamp(30px, 4vw, 64px);
+  padding: 42px clamp(32px, 5vw, 96px) 48px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .workspace-inner {
   width: 100%;
-  max-width: 620px;
+  max-width: 780px;
   margin: auto;
 }
 
@@ -648,7 +646,7 @@ kbd {
 
 .engine-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 13px;
 }
 
@@ -953,17 +951,13 @@ noscript {
   outline-offset: 3px;
 }
 
-@media (max-width: 1200px) and (min-width: 981px) {
-  .app-shell {
-    grid-template-columns: minmax(470px, 1fr) minmax(400px, 0.8fr);
-  }
-
+@media (max-width: 1380px) and (min-width: 1181px) {
   .engine-grid {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1180px) {
   body {
     overflow: auto;
   }
