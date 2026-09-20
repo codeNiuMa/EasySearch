@@ -304,11 +304,51 @@ function initializeTheme() {
 }
 
 function renderDate() {
-  elements.dateLine.textContent = new Intl.DateTimeFormat("zh-CN", {
-    month: "long",
+  const today = new Date();
+  const gregorianParts = new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "numeric",
     day: "numeric",
-    weekday: "long",
-  }).format(new Date());
+  }).formatToParts(today);
+  const getGregorianPart = (type) => gregorianParts.find((part) => part.type === type)?.value || "";
+  const gregorian = `${getGregorianPart("year")}年${getGregorianPart("month")}月${getGregorianPart("day")}日`;
+  const weekday = new Intl.DateTimeFormat("zh-CN", { weekday: "long" }).format(today);
+  const lunar = formatLunarDate(today);
+
+  const primary = document.createElement("span");
+  primary.className = "date-primary";
+  primary.textContent = gregorian;
+
+  const secondary = document.createElement("span");
+  secondary.className = "date-secondary";
+  secondary.textContent = lunar ? `${weekday} · ${lunar}` : weekday;
+
+  elements.dateLine.replaceChildren(primary, secondary);
+  elements.dateLine.setAttribute("aria-label", `${gregorian}，${weekday}${lunar ? `，${lunar}` : ""}`);
+}
+
+function formatLunarDate(date) {
+  try {
+    const parts = new Intl.DateTimeFormat("zh-CN-u-ca-chinese", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).formatToParts(date);
+    const getPart = (type) => parts.find((part) => part.type === type)?.value || "";
+    const dayNumber = Number.parseInt(getPart("day"), 10);
+    const lunarDays = [
+      "初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十",
+      "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十",
+      "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十",
+    ];
+    const yearName = getPart("yearName");
+    const month = getPart("month");
+    const day = lunarDays[dayNumber - 1] || getPart("day");
+    if (!month || !day) return "";
+    return `农历${yearName ? `${yearName}年` : ""}${month}${day}`;
+  } catch {
+    return "";
+  }
 }
 
 function renderCategories() {
