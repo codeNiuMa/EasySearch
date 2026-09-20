@@ -176,20 +176,40 @@ const STORAGE = {
   theme: "easysearch.theme",
   selected: "easysearch.selected-engine",
   custom: "easysearch.custom-engines",
+  widgets: "easysearch.widgets",
+  weatherLocation: "easysearch.weather-location",
+  weatherCache: "easysearch.weather-cache",
 };
+
+const DEFAULT_WIDGETS = {
+  weather: true,
+  focus: true,
+  privacy: true,
+  shortcuts: true,
+};
+
+const WEATHER_CACHE_DURATION = 20 * 60 * 1000;
 
 const CATEGORY_ORDER = ["全部", "通用", "知识", "开发", "社区", "视频", "生活", "地图", "自定义"];
 const state = {
   category: "全部",
   selectedId: localStorage.getItem(STORAGE.selected) || "google",
   customEngines: readCustomEngines(),
+  widgets: readWidgetPreferences(),
+  weatherLocation: readWeatherLocation(),
+  locationResults: [],
 };
 
 const elements = {
   root: document.documentElement,
   themeMeta: document.querySelector('meta[name="theme-color"]'),
   themeToggle: document.querySelector("#theme-toggle"),
+  settingsToggle: document.querySelector("#settings-toggle"),
   dateLine: document.querySelector("#date-line"),
+  weatherChip: document.querySelector("#weather-chip"),
+  weatherSymbol: document.querySelector("#weather-symbol"),
+  weatherPrimary: document.querySelector("#weather-primary"),
+  weatherSecondary: document.querySelector("#weather-secondary"),
   searchForm: document.querySelector("#search-form"),
   searchInput: document.querySelector("#search-input"),
   searchHint: document.querySelector("#search-hint"),
@@ -207,6 +227,16 @@ const elements = {
   formError: document.querySelector("#form-error"),
   customListSection: document.querySelector("#custom-list-section"),
   customList: document.querySelector("#custom-list"),
+  widgetGrid: document.querySelector(".widget-grid"),
+  settingsDialog: document.querySelector("#settings-dialog"),
+  widgetToggles: document.querySelectorAll("[data-widget-toggle]"),
+  weatherSettings: document.querySelector("#weather-settings"),
+  savedWeatherLocation: document.querySelector("#saved-weather-location"),
+  locationQuery: document.querySelector("#location-query"),
+  searchLocation: document.querySelector("#search-location"),
+  useCurrentLocation: document.querySelector("#use-current-location"),
+  locationStatus: document.querySelector("#location-status"),
+  locationResults: document.querySelector("#location-results"),
 };
 
 function readCustomEngines() {
@@ -215,6 +245,42 @@ function readCustomEngines() {
     return Array.isArray(value) ? value.filter(isValidStoredEngine) : [];
   } catch {
     return [];
+  }
+}
+
+function readWidgetPreferences() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE.widgets) || "{}");
+    return Object.fromEntries(
+      Object.entries(DEFAULT_WIDGETS).map(([id, fallback]) => [
+        id,
+        typeof saved?.[id] === "boolean" ? saved[id] : fallback,
+      ]),
+    );
+  } catch {
+    return { ...DEFAULT_WIDGETS };
+  }
+}
+
+function readWeatherLocation() {
+  try {
+    const location = JSON.parse(localStorage.getItem(STORAGE.weatherLocation) || "null");
+    const latitude = Number(location?.latitude);
+    const longitude = Number(location?.longitude);
+    if (
+      typeof location?.name !== "string" ||
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      return null;
+    }
+    return { name: location.name.slice(0, 80), latitude, longitude };
+  } catch {
+    return null;
   }
 }
 
@@ -301,6 +367,217 @@ function initializeTheme() {
   const saved = localStorage.getItem(STORAGE.theme);
   const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   setTheme(saved || preferred);
+}
+
+function applyWidgetPreferences() {
+  Object.entries(state.widgets).forEach(([id, visible]) => {
+    document.querySelectorAll(`[data-widget="${id}"]`).forEach((widget) => {
+      widget.hidden = !visible;
+    });
+  });
+
+  elements.widgetToggles.forEach((toggle) => {
+    toggle.checked = state.widgets[toggle.dataset.widgetToggle] !== false;
+  });
+
+  elements.widgetGrid.hidden = !state.widgets.focus && !state.widgets.privacy;
+  elements.widgetGrid.classList.toggle("single-widget", state.widgets.focus !== state.widgets.privacy);
+  if (state.widgets.weather) loadWeather();
+}
+
+function setWidgetVisibility(id, visible) {
+  if (!(id in DEFAULT_WIDGETS)) return;
+  state.widgets[id] = visible;
+  localStorage.setItem(STORAGE.widgets, JSON.stringify(state.widgets));
+  applyWidgetPreferences();
+}
+
+function openSettingsDialog() {
+  renderSavedWeatherLocation();
+  elements.settingsDialog.showModal();
+}
+
+function closeSettingsDialog() {
+  elements.settingsDialog.close();
+}
+
+function renderSavedWeatherLocation() {
+  elements.savedWeatherLocation.textContent = state.weatherLocation
+    ? `当前：${state.weatherLocation.name}`
+    : "尚未设置；不会自动请求定位";
+}
+
+function setLocationStatus(message, isError = false) {
+  elements.locationStatus.textContent = message;
+  elements.locationStatus.classList.toggle("is-error", isError);
+}
+
+function saveWeatherLocation(location) {
+  state.weatherLocation = {
+    name: location.name,
+    latitude: Number(location.latitude),
+    longitude: Number(location.longitude),
+  };
+  localStorage.setItem(STORAGE.weatherLocation, JSON.stringify(state.weatherLocation));
+  localStorage.removeItem(STORAGE.weatherCache);
+  renderSavedWeatherLocation();
+  elements.locationResults.replaceChildren();
+  state.locationResults = [];
+  setLocationStatus(`已使用 ${state.weatherLocation.name}，正在更新天气…`);
+  loadWeather(true);
+}
+
+async function searchWeatherLocations() {
+  const query = elements.locationQuery.value.trim();
+  if (query.length < 2) {
+    setLocationStatus("请输入至少 2 个字符的城市名称。", true);
+    elements.locationQuery.focus();
+    return;
+  }
+
+  elements.searchLocation.disabled = true;
+  setLocationStatus("正在查找城市…");
+  elements.locationResults.replaceChildren();
+
+  try {
+    const params = new URLSearchParams({ name: query, count: "5", language: "zh", format: "json" });
+    const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${params}`);
+    if (!response.ok) throw new Error(`Geocoding request failed: ${response.status}`);
+    const data = await response.json();
+    state.locationResults = Array.isArray(data.results) ? data.results : [];
+    renderLocationResults();
+    setLocationStatus(state.locationResults.length ? "请选择最符合的地点。" : "没有找到匹配地点，请尝试更完整的名称。", !state.locationResults.length);
+  } catch (error) {
+    console.warn("EasySearch location search failed", error);
+    setLocationStatus("城市查询暂时不可用，请稍后再试。", true);
+  } finally {
+    elements.searchLocation.disabled = false;
+  }
+}
+
+function renderLocationResults() {
+  elements.locationResults.innerHTML = state.locationResults
+    .map((location, index) => {
+      const details = [location.admin1, location.country].filter(Boolean).join(" · ");
+      return `
+        <button class="location-result" type="button" data-location-index="${index}">
+          <span>${escapeMarkup(location.name)}</span>
+          <small>${escapeMarkup(details)}</small>
+        </button>
+      `;
+    })
+    .join("");
+}
+
+function useCurrentWeatherLocation() {
+  if (!navigator.geolocation) {
+    setLocationStatus("当前浏览器不支持位置授权，请搜索城市。", true);
+    return;
+  }
+
+  elements.useCurrentLocation.disabled = true;
+  setLocationStatus("等待浏览器位置授权…");
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      elements.useCurrentLocation.disabled = false;
+      saveWeatherLocation({ name: "当前位置", latitude: coords.latitude, longitude: coords.longitude });
+    },
+    (error) => {
+      elements.useCurrentLocation.disabled = false;
+      const denied = error.code === error.PERMISSION_DENIED;
+      setLocationStatus(denied ? "未获得位置权限；可以改用城市搜索。" : "暂时无法获取当前位置，请搜索城市。", true);
+    },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 30 * 60 * 1000 },
+  );
+}
+
+function readWeatherCache(location) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(STORAGE.weatherCache) || "null");
+    const sameLocation =
+      Math.abs(cache?.latitude - location.latitude) < 0.001 &&
+      Math.abs(cache?.longitude - location.longitude) < 0.001;
+    if (!sameLocation || Date.now() - cache.savedAt > WEATHER_CACHE_DURATION) return null;
+    return cache.weather;
+  } catch {
+    return null;
+  }
+}
+
+function getWeatherPresentation(code, isDay) {
+  if (code === 0) return { symbol: isDay ? "☀" : "☾", label: "晴" };
+  if ([1, 2].includes(code)) return { symbol: "⛅", label: code === 1 ? "大部晴朗" : "多云" };
+  if (code === 3) return { symbol: "☁", label: "阴" };
+  if ([45, 48].includes(code)) return { symbol: "≋", label: "雾" };
+  if (code >= 51 && code <= 57) return { symbol: "🌦", label: "毛毛雨" };
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return { symbol: "🌧", label: "雨" };
+  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return { symbol: "❄", label: "雪" };
+  if (code >= 95) return { symbol: "⛈", label: "雷暴" };
+  return { symbol: "○", label: "天气" };
+}
+
+function renderWeather(weather) {
+  const temperature = Math.round(Number(weather.temperature_2m));
+  const apparent = Math.round(Number(weather.apparent_temperature));
+  const presentation = getWeatherPresentation(Number(weather.weather_code), Number(weather.is_day) === 1);
+  elements.weatherSymbol.textContent = presentation.symbol;
+  elements.weatherPrimary.textContent = `${temperature}° · ${presentation.label}`;
+  elements.weatherSecondary.textContent = `${state.weatherLocation.name} · 体感 ${apparent}°`;
+  elements.weatherChip.setAttribute(
+    "aria-label",
+    `${state.weatherLocation.name}，${presentation.label}，${temperature}度，体感${apparent}度；打开天气设置`,
+  );
+}
+
+async function loadWeather(force = false) {
+  if (!state.widgets.weather) return;
+  if (!state.weatherLocation) {
+    elements.weatherSymbol.textContent = "○";
+    elements.weatherPrimary.textContent = "设置天气地点";
+    elements.weatherSecondary.textContent = "点击后选择城市";
+    elements.weatherChip.setAttribute("aria-label", "尚未设置天气地点；打开天气设置");
+    return;
+  }
+
+  const cached = !force && readWeatherCache(state.weatherLocation);
+  if (cached) {
+    renderWeather(cached);
+    return;
+  }
+
+  elements.weatherSymbol.textContent = "…";
+  elements.weatherPrimary.textContent = "正在获取天气";
+  elements.weatherSecondary.textContent = state.weatherLocation.name;
+
+  try {
+    const params = new URLSearchParams({
+      latitude: String(state.weatherLocation.latitude),
+      longitude: String(state.weatherLocation.longitude),
+      current: "temperature_2m,apparent_temperature,weather_code,is_day",
+      timezone: "auto",
+    });
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+    const data = await response.json();
+    if (!data.current) throw new Error("Weather response missing current values");
+    localStorage.setItem(
+      STORAGE.weatherCache,
+      JSON.stringify({
+        latitude: state.weatherLocation.latitude,
+        longitude: state.weatherLocation.longitude,
+        savedAt: Date.now(),
+        weather: data.current,
+      }),
+    );
+    renderWeather(data.current);
+    if (elements.settingsDialog.open) setLocationStatus(`已更新 ${state.weatherLocation.name} 的天气。`);
+  } catch (error) {
+    console.warn("EasySearch weather request failed", error);
+    elements.weatherSymbol.textContent = "!";
+    elements.weatherPrimary.textContent = "天气暂不可用";
+    elements.weatherSecondary.textContent = `${state.weatherLocation.name} · 点击设置`;
+    if (elements.settingsDialog.open) setLocationStatus("天气请求失败，请稍后重试。", true);
+  }
 }
 
 function renderDate() {
@@ -610,6 +887,39 @@ elements.themeToggle.addEventListener("click", () => {
   setTheme(elements.root.dataset.theme === "dark" ? "light" : "dark");
 });
 
+elements.settingsToggle.addEventListener("click", openSettingsDialog);
+elements.weatherChip.addEventListener("click", openSettingsDialog);
+
+elements.settingsDialog.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-settings]")) closeSettingsDialog();
+});
+
+elements.widgetToggles.forEach((toggle) => {
+  toggle.addEventListener("change", () => {
+    setWidgetVisibility(toggle.dataset.widgetToggle, toggle.checked);
+  });
+});
+
+elements.searchLocation.addEventListener("click", searchWeatherLocations);
+
+elements.locationQuery.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    searchWeatherLocations();
+  }
+});
+
+elements.locationResults.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-location-index]");
+  if (!button) return;
+  const location = state.locationResults[Number(button.dataset.locationIndex)];
+  if (!location) return;
+  const detail = [location.name, location.admin1, location.country].filter(Boolean).join(" · ");
+  saveWeatherLocation({ name: detail, latitude: location.latitude, longitude: location.longitude });
+});
+
+elements.useCurrentLocation.addEventListener("click", useCurrentWeatherLocation);
+
 elements.searchForm.addEventListener("submit", (event) => {
   event.preventDefault();
   performSearch();
@@ -670,6 +980,8 @@ document.addEventListener("keydown", (event) => {
 
 initializeTheme();
 renderDate();
+renderSavedWeatherLocation();
+applyWidgetPreferences();
 renderCategories();
 renderEngines();
 registerAgentTools();

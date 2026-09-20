@@ -36,6 +36,12 @@
           <span class="status-dot" aria-hidden="true"></span>
           无广告 · 无追踪代码
         </span>
+        <button class="icon-button" id="settings-toggle" type="button" aria-label="打开组件设置">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3V9.6h.1A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.56 3.7l.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1v-.1h4v.1A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19.4 8.5a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4h-.1A1.7 1.7 0 0 0 19.4 15Z"></path>
+          </svg>
+        </button>
         <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深色模式">
           <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="4"></circle>
@@ -73,7 +79,22 @@
               <p class="eyebrow">DIRECT SEARCH</p>
               <h1 id="page-title">搜索，不必先去首页</h1>
             </div>
-            <p class="date-line" id="date-line" aria-label="今天"></p>
+            <div class="heading-meta">
+              <p class="date-line" id="date-line" aria-label="今天"></p>
+              <button
+                class="weather-chip"
+                id="weather-chip"
+                type="button"
+                data-widget="weather"
+                aria-label="打开天气设置"
+              >
+                <span class="weather-symbol" id="weather-symbol" aria-hidden="true">○</span>
+                <span class="weather-copy">
+                  <strong id="weather-primary">设置天气地点</strong>
+                  <span id="weather-secondary">点击后选择城市</span>
+                </span>
+              </button>
+            </div>
           </div>
 
           <form class="search-panel" id="search-form" novalidate>
@@ -105,13 +126,13 @@
           </form>
 
           <div class="widget-grid">
-            <div class="focus-card">
+            <div class="focus-card" data-widget="focus">
               <span class="eyebrow">FOCUS MODE</span>
               <h2>只带着问题出发</h2>
               <p>没有热榜、推荐和自动加载的内容。选好入口，直接抵达结果。</p>
             </div>
 
-            <div class="privacy-widget">
+            <div class="privacy-widget" data-widget="privacy">
               <span class="widget-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.9 8.5 7 10 4.1-1.5 7-5.4 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
               </span>
@@ -122,7 +143,7 @@
             </div>
           </div>
 
-          <div class="shortcut-list" aria-label="快捷键">
+          <div class="shortcut-list" data-widget="shortcuts" aria-label="快捷键">
             <div><span>聚焦搜索框</span><kbd>/</kbd></div>
             <div><span>切换前 9 个入口</span><kbd>Alt</kbd><span class="key-plus">+</span><kbd>1–9</kbd></div>
             <div><span>开始搜索</span><kbd>Enter</kbd></div>
@@ -184,6 +205,71 @@
           <div class="custom-list" id="custom-list"></div>
         </section>
       </form>
+    </dialog>
+
+    <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+      <div class="dialog-card settings-card">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">PAGE SETTINGS</p>
+            <h2 id="settings-title">组件设置</h2>
+          </div>
+          <button class="dialog-close" type="button" data-close-settings aria-label="关闭设置">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+
+        <p class="dialog-copy">按自己的使用习惯精简页面。显示偏好和天气地点只保存在当前浏览器。</p>
+
+        <section class="settings-section" aria-labelledby="widget-settings-title">
+          <h3 id="widget-settings-title">显示组件</h3>
+          <div class="settings-list">
+            <label class="setting-row">
+              <span><strong>天气</strong><small>日期旁的当前天气</small></span>
+              <input type="checkbox" data-widget-toggle="weather" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+            <label class="setting-row">
+              <span><strong>专注说明</strong><small>搜索理念提示卡片</small></span>
+              <input type="checkbox" data-widget-toggle="focus" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+            <label class="setting-row">
+              <span><strong>本地保存提示</strong><small>隐私与本地配置说明</small></span>
+              <input type="checkbox" data-widget-toggle="privacy" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+            <label class="setting-row">
+              <span><strong>快捷键提示</strong><small>页面下方的操作速查</small></span>
+              <input type="checkbox" data-widget-toggle="shortcuts" />
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="settings-section weather-settings" id="weather-settings" aria-labelledby="weather-settings-title">
+          <div class="settings-section-heading">
+            <div>
+              <h3 id="weather-settings-title">天气地点</h3>
+              <p id="saved-weather-location">尚未设置</p>
+            </div>
+            <button class="secondary-button compact-button" id="use-current-location" type="button">使用当前位置</button>
+          </div>
+
+          <div class="location-search">
+            <label class="sr-only" for="location-query">搜索城市</label>
+            <input id="location-query" type="search" autocomplete="off" placeholder="输入城市，例如：杭州" />
+            <button class="primary-button compact-button" id="search-location" type="button">查找</button>
+          </div>
+          <p class="location-status" id="location-status" aria-live="polite"></p>
+          <div class="location-results" id="location-results"></div>
+          <p class="weather-credit">
+            天气与城市数据由
+            <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
+            提供。仅在天气组件开启且已设置地点时请求天气。
+          </p>
+        </section>
+      </div>
     </dialog>
 
     <noscript>EasySearch 需要启用 JavaScript 才能生成搜索地址。</noscript>
